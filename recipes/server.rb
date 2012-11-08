@@ -66,3 +66,29 @@ template "#{node["icinga"]["conf_dir"]}/icinga.cfg" do
     :immediately
   )
 end
+
+
+include_recipe "apache2"
+
+web_group = node["apache"]["group"]
+
+if Chef::Config[:solo]
+  Chef::Log.error("This recipe uses search. Chef Solo does not support search.")
+else
+  sysadmins = search(:users, "groups:#{node["icinga"]["users_databag_group"]}")
+end
+
+template "#{node["icinga"]["conf_dir"]}/htpasswd.users" do
+  source "htpasswd.users.erb"
+  owner "root"
+  group web_group
+  mode 00640
+  variables(
+    :sysadmins => sysadmins
+  )
+  notifies(
+    :reload,
+    resources(:service => "apache2"),
+    :immediately
+  )
+end
