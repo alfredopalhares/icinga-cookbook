@@ -1,0 +1,59 @@
+###############################################################################
+# contacts.cfg
+###############################################################################
+
+
+
+###############################################################################
+###############################################################################
+#
+# CONTACTS
+#
+###############################################################################
+###############################################################################
+
+# In this simple config file, a single contact will receive all alerts.
+
+define contact{
+  contact_name                    root
+  alias                           Root
+  service_notification_period     24x7
+  host_notification_period        24x7
+  service_notification_options    w,u,c,r
+  host_notification_options       d,r
+  service_notification_commands   notify-service-by-email
+  host_notification_commands      notify-host-by-email
+  email                           root@localhost
+}
+
+<% @sysadmins.each do |sa| -%>
+define contact{
+  contact_name <%= sa["id"] %>
+  service_notification_period     24x7
+  host_notification_period        24x7
+  service_notification_options    w,u,c,r
+  host_notification_options       d,r
+  service_notification_commands   notify-service-by-email
+  host_notification_commands      notify-host-by-email
+  <%= "email  #{sa["email"]}" unless sa["email"].nil? %>
+}
+
+<% end -%>
+
+
+###############################################################################
+###############################################################################
+#
+# CONTACT GROUPS
+#
+###############################################################################
+###############################################################################
+
+# We only have one contact in this simple configuration file, so there is
+# no need to create more than one contact group.
+
+define contactgroup{
+  contactgroup_name       admins
+  alias                   Nagios Administrators
+  members                 <%= @members.join(",") %>
+}

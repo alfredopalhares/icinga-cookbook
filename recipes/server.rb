@@ -92,3 +92,24 @@ template "#{node["icinga"]["conf_dir"]}/htpasswd.users" do
     :immediately
   )
 end
+
+members = Array.new()
+sysadmins.each do |sa|
+  members.push(sa["id"])
+end
+
+template "#{node["icinga"]["object_dir"]}/contacts_icinga.cfg" do
+  source "contacts.cfg.erb"
+  owner "root"
+  group "root"
+  mode 00644
+  variables(
+    :sysadmins => sysadmins,
+    :members => members
+  )
+  notifies(
+    :reload,
+    resources(:service => "icinga"),
+    :immediately
+  )
+end
