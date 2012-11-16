@@ -16,6 +16,8 @@ default["icinga"]["process_performance_data"] = 0
 default["icinga"]["perfdata_file_mode"] = "a"
 default["icinga"]["perfdata_file_processing_interval"] = 0
 
+default["icinga"]["allow_empty_hostgroup_assignment"] = 1
+
 default["icinga"]["obsess_over_services"] = 0
 default["icinga"]["ocsp_command"] = "somecommand"
 default["icinga"]["obsess_over_hosts"] = 0

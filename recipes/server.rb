@@ -32,6 +32,7 @@ template "#{node["icinga"]["conf_dir"]}/icinga.cfg" do
     :process_performance_data => node["icinga"]["process_performance_data"],
     :perfdata_file_mode => node["icinga"]["perfdata_file_mode"],
     :perfdata_file_processing_interval => node["icinga"]["perfdata_file_processing_interval"],
+    :allow_empty_hostgroup_assignment => node["icinga"]["allow_empty_hostgroup_assignment"],
     :obsess_over_services => node["icinga"]["obsess_over_services"],
     :ocsp_command => node["icinga"]["ocsp_command"],
     :obsess_over_hosts => node["icinga"]["obsess_over_hosts"],
