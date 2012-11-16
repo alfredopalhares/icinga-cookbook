@@ -1,0 +1,13 @@
+define hostgroup {
+  hostgroup_name all
+  alias All Servers
+  members *
+}
+
+<% @hostgroups.each() do |g| %>
+define hostgroup {
+  hostgroup_name <%= g["name"] %>
+  alias <%= g["alias"] %>
+}
+
+<% end %>

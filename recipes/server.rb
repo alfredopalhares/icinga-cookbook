@@ -63,8 +63,7 @@ template "#{node["icinga"]["conf_dir"]}/icinga.cfg" do
   )
   notifies(
     :reload,
-    resources(:service => "icinga"),
-    :immediately
+    resources(:service => "icinga")
   )
 end
 
@@ -89,8 +88,7 @@ template "#{node["icinga"]["conf_dir"]}/htpasswd.users" do
   )
   notifies(
     :reload,
-    resources(:service => "apache2"),
-    :immediately
+    resources(:service => "apache2")
   )
 end
 
@@ -110,7 +108,95 @@ template "#{node["icinga"]["object_dir"]}/contacts_icinga.cfg" do
   )
   notifies(
     :reload,
-    resources(:service => "icinga"),
-    :immediately
+    resources(:service => "icinga")
+  )
+end
+
+
+nodes = Array.new()
+if Chef::Config[:solo]
+  Chef::Log.error("This recipe uses search. Chef Solo does not support search.")
+  nodes.push(node)
+else
+  search(:node, "name:*").each() do |n|
+    nodes.push(n)
+  end
+end
+
+
+
+# Server hostgroups
+hostgroups = Array.new()
+
+if Chef::Config[:solo]
+  Chef::Log.fatal("You need to be able to search to fill the hostgroups")
+else
+  # Add roles to hostgroups
+  search(:role, "*:*").each() do |r|
+    group = Hash.new()
+    group["name"] = r.name
+    group["alias"] = r.description
+    hostgroups.push(group)
+  end
+end
+
+os_list = Array.new()
+#Also add diferent OS
+nodes.each() do |n|
+  if !os_list.include?(n["os"])
+    os_list.push(n["os"])
+  end
+end
+
+os_list.each() do |os|
+  group = Hash.new()
+  group["name"] = os
+  group["alias"] = os + " Operative System"
+  hostgroups.push(group)
+end
+
+template "#{node["icinga"]["object_dir"]}/hostgroups_icinga.cfg" do
+  source "hostgroups.cfg.erb"
+  owner "root"
+  group "root"
+  mode 00644
+  variables(
+    :hostgroups => hostgroups
+  )
+  notifies(
+    :reload,
+    resources(:service => "icinga")
+  )
+end
+
+server_hostgroups = Array.new()
+
+nodes.each() do |n|
+  n["hostgroups"] = Array.new()
+  if !n.run_list.roles.empty?
+    n.run_list.roles.each() do |r|
+      n["hostgroups"].push(r.name)
+    end
+  end
+  n["hostgroups"].push(n["os"])
+
+  if n["name"] == node["name"]
+    n["hostgroups"].each() do |group|
+      server_hostgroups.push(group)
+    end
+  end
+end
+
+template "#{node["icinga"]["object_dir"]}/hosts_icinga.cfg" do
+  source "hosts.cfg.erb"
+  owner "root"
+  group "root"
+  mode 00644
+  variables(
+    :nodes => nodes
+  )
+  notifies(
+    :reload,
+    resources(:service => "icinga")
   )
 end
