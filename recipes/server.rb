@@ -112,6 +112,27 @@ template "#{node["icinga"]["object_dir"]}/contacts_icinga.cfg" do
   )
 end
 
+directory node["icinga"]["command_dir"] do
+  owner "root"
+  group "root"
+  mode 00755
+end
+
+icinga_command "notify-host-by-email" do
+  command "/usr/bin/printf \"%b\" \"***** Icinga *****\\n\\nNotification Type: $NOTIFICATIONTYPE$\\nHost: $HOSTNAME$\\nState: $HOSTSTATE$\\nAddress: $HOSTADDRESS$\\nInfo: $HOSTOUTPUT$\\n\\nDate/Time: $LONGDATETIME$\\n\" | /usr/bin/mail -s \"** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **\" $CONTACTEMAIL$"
+end
+
+icinga_command "notify-service-by-email" do
+  command "/usr/bin/printf \"%b\" \"***** Icinga *****\\n\\nNotification Type: $NOTIFICATIONTYPE$\\n\\nService: $SERVICEDESC$\\nHost: $HOSTALIAS$\\nAddress: $HOSTADDRESS$\\nState: $SERVICESTATE$\\n\\nDate/Time: $LONGDATETIME$\\n\\nAdditional Info:\\n\\n$SERVICEOUTPUT$\\n\" | /usr/bin/mail -s \"** $NOTIFICATIONTYPE$ Service Alert: $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$ **\" $CONTACTEMAIL$"
+end
+
+icinga_command "process-host-perfdata" do
+  command "/usr/bin/printf \"%b\" \"$LASTHOSTCHECK$\\t$HOSTNAME$\\t$HOSTSTATE$\\t$HOSTATTEMPT$\\t$HOSTSTATETYPE$\\t$HOSTEXECUTIONTIME$\\t$HOSTOUTPUT$\\t$HOSTPERFDATA$\\n\" >> /var/lib/icinga/host-perfdata.out"
+end
+
+icinga_command "process-service-perfdata" do
+  command "/usr/bin/printf \"%b\" \"$LASTSERVICECHECK$\\t$HOSTNAME$\\t$SERVICEDESC$\\t$SERVICESTATE$\\t$SERVICEATTEMPT$\\t$SERVICESTATETYPE$\\t$SERVICEEXECUTIONTIME$\\t$SERVICELATENCY$\\t$SERVICEOUTPUT$\\t$SERVICEPERFDATA$\\n\" >> /var/lib/icinga/service-perfdata.out"
+end
 
 nodes = Array.new()
 if Chef::Config[:solo]
