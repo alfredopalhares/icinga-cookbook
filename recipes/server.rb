@@ -134,6 +134,10 @@ icinga_command "process-service-perfdata" do
   command "/usr/bin/printf \"%b\" \"$LASTSERVICECHECK$\\t$HOSTNAME$\\t$SERVICEDESC$\\t$SERVICESTATE$\\t$SERVICEATTEMPT$\\t$SERVICESTATETYPE$\\t$SERVICEEXECUTIONTIME$\\t$SERVICELATENCY$\\t$SERVICEOUTPUT$\\t$SERVICEPERFDATA$\\n\" >> /var/lib/icinga/service-perfdata.out"
 end
 
+file "#{node["icinga"]["conf_dir"]}/commands.cfg" do
+  action :delete
+end
+
 nodes = Array.new()
 if Chef::Config[:solo]
   Chef::Log.error("This recipe uses search. Chef Solo does not support search.")
