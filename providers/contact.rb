@@ -57,9 +57,9 @@ action :add do
 end
 
 action :remove do
-  if ::File.exists?("#{node["icinga"]["contacts_dir"]}/#{new_resource.command_name}.cfg" )
-    Chef::Log.info("Deleting #{new_resource.command_name} command from #{node["icinga"]["contacts_dir"]})")
-    file "#{node["icinga"]["contacts_dir"]}/#{new_resource.command_name}.cfg" do
+  if ::File.exists?("#{node["icinga"]["contacts_dir"]}/#{new_resource.contact_name}.cfg" )
+    Chef::Log.info("Deleting #{new_resource.contact_name} command from #{node["icinga"]["contacts_dir"]})")
+    file "#{node["icinga"]["contacts_dir"]}/#{new_resource.contact_name}.cfg" do
       notifies(
         :reload,
         resources(:service => "icinga")
