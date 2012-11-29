@@ -133,6 +133,14 @@ icinga_contactgroup "admins" do
   members members
 end
 
+file "#{node["icinga"]["object_dir"]}/contacts_icinga.cfg" do
+  action :delete
+  notifies(
+    :reload,
+    resources(:service => "icinga")
+  )
+end
+
 directory node["icinga"]["command_dir"] do
   owner "root"
   group "root"
