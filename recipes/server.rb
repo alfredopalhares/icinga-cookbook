@@ -98,6 +98,19 @@ directory node["icinga"]["contacts_dir"] do
   mode 00755
 end
 
+icinga_contact "root" do
+  contact_alias "Root"
+  host_notifications_enabled 0
+  service_notifications_enabled 0
+  service_notification_period "24x7"
+  host_notification_period "24x7"
+  service_notification_options [ "w", "u", "c", "r" ]
+  host_notification_options [ "d", "r" ]
+  service_notification_commands [ "notify-service-by-email" ]
+  host_notification_commands [ "notify-host-by-email" ]
+  email "root@localhost"
+end
+
 sysadmins.each do |sa|
   icinga_contact sa["id"] do
     if sa.has_key?("comment")
@@ -165,6 +178,10 @@ end
 
 file "#{node["icinga"]["conf_dir"]}/commands.cfg" do
   action :delete
+  notifies(
+    :reload,
+    resources(:service => "icinga")
+  )
 end
 
 nodes = Array.new()
