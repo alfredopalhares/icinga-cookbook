@@ -92,24 +92,45 @@ template "#{node["icinga"]["conf_dir"]}/htpasswd.users" do
   )
 end
 
+directory node["icinga"]["contacts_dir"] do
+  owner "root"
+  group "root"
+  mode 00755
+end
+
+sysadmins.each do |sa|
+  icinga_contact sa["id"] do
+    if sa.has_key?("comment")
+      contact_alias sa["comment"]
+    end
+    host_notifications_enabled 1
+    service_notifications_enabled 1
+    host_notification_period "24x7"
+    service_notification_period "24x7"
+    host_notification_options [ "d", "r" ]
+    service_notification_options [ "w", "u", "c", "r" ]
+    host_notification_commands [ "notify-host-by-email" ]
+    service_notification_commands [ "notify-service-by-email" ]
+    if sa.has_key?("email")
+      email sa["email"]
+    end
+  end
+end
+
+directory node["icinga"]["contactgroups_dir"] do
+  owner "root"
+  group "root"
+  mode 00755
+end
+
 members = Array.new()
 sysadmins.each do |sa|
   members.push(sa["id"])
 end
 
-template "#{node["icinga"]["object_dir"]}/contacts_icinga.cfg" do
-  source "contacts.cfg.erb"
-  owner "root"
-  group "root"
-  mode 00644
-  variables(
-    :sysadmins => sysadmins,
-    :members => members
-  )
-  notifies(
-    :reload,
-    resources(:service => "icinga")
-  )
+icinga_contactgroup "admins" do
+  contactgroup_alias "Icinga Administrators"
+  members members
 end
 
 directory node["icinga"]["command_dir"] do
