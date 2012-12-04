@@ -3,6 +3,7 @@ default["icinga"]["nagios_plugins"] = "/etc/nagios-plugins/config"
 default["icinga"]["object_dir"] = "#{node["icinga"]["conf_dir"]}/objects"
 default["icinga"]["command_dir"] = "#{node["icinga"]["object_dir"]}/commands"
 default["icinga"]["contacts_dir"] = "#{node["icinga"]["object_dir"]}/contacts"
+default["icinga"]["hosts_dir"] = "#{node["icinga"]["object_dir"]}/hosts"
 default["icinga"]["contactgroups_dir"] = "#{node["icinga"]["object_dir"]}/contactgroups"
 default["icinga"]["module_dir"] = "#{node["icinga"]["conf_dir"]}/modules"
 
