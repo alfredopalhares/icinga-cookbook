@@ -367,7 +367,9 @@ class Chef
     class IcingaHost < Chef::Provider
       def initialize(new_resource, run_context)
         super(new_resource, run_context)
+        @path = "#{node["icinga"]["hosts_dir"]}+/#{new_resource.name}.cfg"
       end
+
     end
   end
 end
