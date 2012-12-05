@@ -371,6 +371,8 @@ class Chef
       end
 
       def load_current_definition()
+        @current_resource = Chef::Resource::IcingaHost.new(@new_resource.name)
+
         if ::File.exists?(@path)
           parsed_host = nil
           ::File.open(@path) do |f|
