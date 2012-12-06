@@ -1,4 +1,4 @@
-require "nagios_config"
+require "nagios_parser/object/parser"
 
 class Chef
   class Resource
@@ -437,6 +437,11 @@ class Chef
         return current_resource
       end
 
+      def parse(io)
+        object = io.read()
+        data = NagiosParser::Object::Parser.parse(object)
+        return data
+      end
     end
   end
 end
